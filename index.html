@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>작업 체크리스트</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+        }
+        
+        /* 헤더 */
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #c7d2fe;
+            margin-top: -4px;
+        }
+        
+        .reset-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        /* 탭 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            flex: 0 0 auto;
+            padding: 16px 18px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .tab-active {
+            border-bottom: 4px solid #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        
+        .add-tab {
+            flex: 0 0 52px;
+            padding: 16px 12px;
+            font-size: 28px;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* 본문 */
+        .content {
+            padding: 24px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e2937;
+        }
+        
+        .progress {
+            font-size: 14px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .progress-bar-bg {
+            width: 80px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #4f46e5;
+            transition: width 0.3s ease;
+        }
+        
+        /* 체크리스트 아이템 */
+        .item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .item.checked {
+            opacity: 0.85;
+        }
+        
+        .item .checkbox-wrapper {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            margin-right: 16px;
+        }
+        
+        .item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .item .custom-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .item input[type="checkbox"]:checked + .custom-checkbox {
+            background: #4f46e5;
+            border-color: #4f46e5;
+        }
+        
+        .item .custom-checkbox svg {
+            width: 18px;
+            height: 18px;
+            color: white;
+        }
+        
+        .item-text {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            color: #334155;
+            transition: all 0.2s ease;
+        }
+        
+        .item.checked .item-text {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #94a3b8;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* 빈 상태 */
+        .empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #64748b;
+            display: none;
+        }
+        
+        /* 추가 입력창 */
+        .add-bar {
+            position: sticky;
+            bottom: 20px;
+            background: #f1f5f9;
+            margin: 0 24px;
+            border-radius: 9999px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .add-input {
+            flex: 1;
+            border: none;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 9999px;
+            font-size: 17px;
+            outline: none;
+        }
+        
+        .add-btn {
+            width: 52px;
+            height: 52px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="header-title">
+                <div class="header-icon">📋</div>
+                <div>
+                    <h1>작업 체크리스트</h1>
+                    <p>카테고리별 장비 체크</p>
+                </div>
+            </div>
+            <button onclick="clearAllChecks()" class="reset-btn">
+                ⟳ 초기화
+            </button>
+        </div>
+
+        <!-- 동적 탭 -->
+        <div id="tabs" class="tabs"></div>
+
+        <div class="content">
+            <!-- 제목 + 진행률 -->
+            <div class="section-header">
+                <h2 id="section-title" class="section-title">🏗️ 무대작업</h2>
+                <div class="progress">
+                    <span id="progress-text">0/0</span>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 체크리스트 -->
+            <div id="list-container" style="min-height: 420px;"></div>
+
+            <!-- 빈 상태 -->
+            <div id="empty-state" class="empty">
+                <div style="font-size: 64px; margin-bottom: 16px;">📦</div>
+                <p style="font-size: 18px; font-weight: 500;">아직 장비가 없습니다</p>
+                <p style="font-size: 14px;">아래에서 바로 추가해보세요</p>
+            </div>
+
+            <!-- 장비 추가 -->
+            <div class="add-bar">
+                <input 
+                    id="new-item-input"
+                    type="text" 
+                    placeholder="장비 이름 입력"
+                    class="add-input"
+                    onkeypress="if(event.key === 'Enter') addNewItem()">
+                <button onclick="addNewItem()" class="add-btn">+</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터 저장 키
+        const STORAGE_KEY = 'workChecklistData'
+        let currentCategoryId = 'stage'
+        
+        let data = {
+            categories: []
+        }
+
+        // 기본 카테고리 (기존 데이터도 여기서 시작)
+        const defaultCategories = [
+            {
+                id: 'stage',
+                name: '무대작업',
+                emoji: '🏗️',
+                items: [
+                    { id: 's1', name: '상판연결집게', checked: false },
+                    { id: 's2', name: '계단피스', checked: false },
+                    { id: 's3', name: '타카총알', checked: false },
+                    { id: 's4', name: '전동드라이브', checked: false },
+                    { id: 's5', name: '수평계', checked: false },
+                    { id: 's6', name: '공구통', checked: false },
+                    { id: 's7', name: '전선보호판(긴고무바닥판)', checked: false },
+                    { id: 's8', name: '전선보호관', checked: false }
+                ]
+            },
+            {
+                id: 'sound',
+                name: '음향작업',
+                emoji: '🔊',
+                items: [
+                    { id: 'a1', name: '무전기', checked: false },
+                    { id: 'a2', name: '건전지', checked: false },
+                    { id: 'a3', name: '핀마이크테이프', checked: false },
+                    { id: 'a4', name: '스피커 실', checked: false },
+                    { id: 'a5', name: '테이프', checked: false }
+                ]
+            },
+            {
+                id: 'rain',
+                name: '우천시',
+                emoji: '☔',
+                items: [
+                    { id: 'r1', name: '비닐', checked: false },
+                    { id: 'r2', name: '텐트 36', checked: false },
+                    { id: 'r3', name: '텐트 33', checked: false },
+                    { id: 'r4', name: '텐트 1.5', checked: false },
+                    { id: 'r5', name: '콘센트비닐(작은비닐)', checked: false }
+                ]
+            }
+        ]
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY)
+            if (saved) {
+                const parsed = JSON.parse(saved)
+                
+                // 이미 새로운 형식(동적 카테고리)인지 확인
+                if (parsed.categories && Array.isArray(parsed.categories) && parsed.categories.length > 0) {
+                    data.categories = parsed.categories
+                } else {
+                    // 이전 버전 데이터 → 새 형식으로 자동 변환 (마이그레이션)
+                    data.categories = []
+                    if (parsed.stage && Array.isArray(parsed.stage)) {
+                        data.categories.push({
+                            id: 'stage',
+                            name: '무대작업',
+                            emoji: '🏗️',
+                            items: parsed.stage
+                        })
+                    }
+                    if (parsed.sound && Array.isArray(parsed.sound)) {
+                        data.categories.push({
+                            id: 'sound',
+                            name: '음향작업',
+                            emoji: '🔊',
+                            items: parsed.sound
+                        })
+                    }
+                    if (parsed.rain && Array.isArray(parsed.rain)) {
+                        data.categories.push({
+                            id: 'rain',
+                            name: '우천시',
+                            emoji: '☔',
+                            items: parsed.rain
+                        })
+                    }
+                    // 마이그레이션 후 저장
+                    saveData()
+                }
+            } else {
+                // 처음 실행 시 기본 카테고리
+                data.categories = JSON.parse(JSON.stringify(defaultCategories))
+                saveData()
+            }
+            
+            // 현재 탭이 없어진 경우 기본으로 stage 선택
+            if (!data.categories.find(c => c.id === currentCategoryId)) {
+                currentCategoryId = data.categories[0].id
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+        }
+
+        // 현재 카테고리 객체 반환
+        function getCurrentCategory() {
+            return data.categories.find(c => c.id === currentCategoryId)
+        }
+
+        // 탭 동적으로 그리기
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs')
+            let html = ''
+            
+            data.categories.forEach(cat => {
+                const isActive = cat.id === currentCategoryId
+                html += `
+                <div onclick="switchCategory('${cat.id}')" 
+                     class="tab ${isActive ? 'tab-active' : ''}">
+                    ${cat.emoji} ${cat.name}
+                </div>`
+            })
+            
+            // 새 카테고리 추가 버튼 (항상 마지막에)
+            html += `
+            <div onclick="addNewCategory()" class="add-tab">
+                +
+            </div>`
+            
+            tabsContainer.innerHTML = html
+        }
+
+        // 카테고리 전환
+        function switchCategory(id) {
+            currentCategoryId = id
+            renderTabs()
+            render()
+        }
+
+        // 새 카테고리 추가 (이게 핵심 기능!)
+        function addNewCategory() {
+            const name = prompt('새 카테고리 이름을 입력하세요\n(예: 조명작업, 영상작업 등)', '')
+            if (!name || name.trim() === '') return
+            
+            const emoji = prompt('이모지를 입력하세요 (예: 💡)\n비워두면 📦 자동 적용', '📦')
+            
+            const newCategory = {
+                id: 'cat-' + Date.now().toString(36),
+                name: name.trim(),
+                emoji: emoji && emoji.trim() !== '' ? emoji.trim() : '📦',
+                items: []
+            }
+            
+            data.categories.push(newCategory)
+            saveData()
+            
+            // 바로 새 카테고리로 이동
+            currentCategoryId = newCategory.id
+            renderTabs()
+            render()
+            
+            alert(`✅ "${newCategory.emoji} ${newCategory.name}" 카테고리가 추가되었습니다!`)
+        }
+
+        function render() {
+            const container = document.getElementById('list-container')
+            const emptyState = document.getElementById('empty-state')
+            const titleEl = document.getElementById('section-title')
+            const progressText = document.getElementById('progress-text')
+            const progressBar = document.getElementById('progress-bar')
+
+            const cat = getCurrentCategory()
+            if (!cat) return
+
+            // 제목 (카테고리 이름 + 이모지)
+            titleEl.innerHTML = `${cat.emoji} ${cat.name}`
+
+            const items = cat.items || []
+            const checkedCount = items.filter(i => i.checked).length
+            const total = items.length
+
+            progressText.textContent = `${checkedCount}/${total}`
+            progressBar.style.width = total === 0 ? '0%' : `${(checkedCount / total) * 100}%`
+
+            if (items.length === 0) {
+                container.innerHTML = ''
+                emptyState.style.display = 'block'
+                return
+            }
+
+            emptyState.style.display = 'none'
+
+            let html = ''
+            items.forEach(item => {
+                html += `
+                <div class="item ${item.checked ? 'checked' : ''}">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" ${item.checked ? 'checked' : ''} 
+                               onchange="toggleCheck('${item.id}')">
+                        <div class="custom-checkbox">
+                            ${item.checked ? 
+                                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7" />
+                                </svg>` : ''}
+                        </div>
+                    </label>
+                    <div class="item-text">${item.name}</div>
+                    <button onclick="deleteItem('${item.id}')" class="delete-btn">✕</button>
+                </div>`
+            })
+            
+            container.innerHTML = html
+        }
+
+        function toggleCheck(id) {
+            const cat = getCurrentCategory()
+            if (!cat) return
+            const item = cat.items.find(i => i.id === id)
+            if (item) {
+                item.checked = !item.checked
+                saveData()
+                render()
+            }
+        }
+
+        function addNewItem() {
+            const input = document.getElementById('new-item-input')
+            const name = input.value.trim()
+            if (!name) return
+
+            const cat = getCurrentCategory()
+            if (!cat) return
+
+            const newItem = {
+                id: 'item-' + Date.now().toString(36),
+                name: name,
+                checked: false
+            }
+            
+            cat.items.push(newItem)
+            saveData()
+            render()
+            input.value = ''
+        }
+
+        function deleteItem(id) {
+            const password = prompt('🛡️ 삭제하려면 비밀번호를 입력하세요\n(2375)')
+            if (password === null) return
+            if (password !== '2375') {
+                alert('❌ 비밀번호가 틀렸습니다.')
+                return
+            }
+            
+            if (confirm('정말 이 장비를 삭제하시겠습니까?')) {
+                const cat = getCurrentCategory()
+                if (cat) {
+                    cat.items = cat.items.filter(item => item.id !== id)
+                    saveData()
+                    render()
+                    alert('✅ 삭제되었습니다!')
+                }
+            }
+        }
+
+        function clearAllChecks() {
+            if (confirm('현재 카테고리의 모든 체크를 해제하시겠습니까?')) {
+                const cat = getCurrentCategory()
+                if (cat) {
+                    cat.items.forEach(item => item.checked = false)
+                    saveData()
+                    render()
+                }
+            }
+        }
+
+        // 초기화
+        function init() {
+            loadData()
+            renderTabs()
+            render()
+            
+            const input = document.getElementById('new-item-input')
+            input.addEventListener('focus', () => {
+                setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 300)
+            })
+            
+            console.log('✅ 카테고리 확장 완료! 이제 + 버튼으로 새로운 카테고리를 마음대로 만들 수 있습니다.')
+        }
+
+        window.onload = init
+    </script>
+</body>
+</html>
