@@ -293,6 +293,20 @@
             cursor: pointer;
         }
 
+        .delete-category-btn {
+            display: block;
+            width: calc(100% - 48px);
+            margin: 16px 24px 8px;
+            padding: 14px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
         /* 카테고리 액션 모달 */
         .modal-overlay {
             display: none;
@@ -411,6 +425,10 @@
                     onkeypress="if(event.key === 'Enter') addNewItem()">
                 <button onclick="addNewItem()" class="add-btn">+</button>
             </div>
+
+            <button onclick="deleteCategory(currentCategoryId)" class="delete-category-btn">
+                🗑️ 현재 카테고리 삭제
+            </button>
         </div>
     </div>
 
@@ -479,14 +497,9 @@
             
             data.categories.forEach(cat => {
                 const active = cat.id === currentCategoryId ? 'tab-active' : ''
-                const gearBtn = cat.id === currentCategoryId
-                    ? `<span onclick="openModal('${cat.id}'); event.stopPropagation();" style="margin-left:6px; font-size:16px; opacity:0.7;">⚙️</span>`
-                    : ''
                 html += `
-                <div class="tab ${active}"
-                     onclick="switchCategory('${cat.id}')"
-                     oncontextmenu="openModal('${cat.id}'); return false;">
-                    ${cat.emoji} ${cat.name}${gearBtn}
+                <div class="tab ${active}" onclick="switchCategory('${cat.id}')">
+                    ${cat.emoji} ${cat.name}
                 </div>`
             })
             
