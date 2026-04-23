@@ -472,7 +472,6 @@
         }
 
         let modalTargetId = null
-        let pressTimer = null
 
         function renderTabs() {
             const container = document.getElementById('tabs')
@@ -480,27 +479,19 @@
             
             data.categories.forEach(cat => {
                 const active = cat.id === currentCategoryId ? 'tab-active' : ''
+                const gearBtn = cat.id === currentCategoryId
+                    ? `<span onclick="openModal('${cat.id}'); event.stopPropagation();" style="margin-left:6px; font-size:16px; opacity:0.7;">⚙️</span>`
+                    : ''
                 html += `
                 <div class="tab ${active}"
                      onclick="switchCategory('${cat.id}')"
-                     oncontextmenu="openModal('${cat.id}'); return false;"
-                     ontouchstart="startPress('${cat.id}')"
-                     ontouchend="cancelPress()"
-                     ontouchmove="cancelPress()">
-                    ${cat.emoji} ${cat.name}
+                     oncontextmenu="openModal('${cat.id}'); return false;">
+                    ${cat.emoji} ${cat.name}${gearBtn}
                 </div>`
             })
             
             html += `<div onclick="addNewCategory()" class="add-tab">+</div>`
             container.innerHTML = html
-        }
-
-        function startPress(id) {
-            pressTimer = setTimeout(() => openModal(id), 600)
-        }
-
-        function cancelPress() {
-            clearTimeout(pressTimer)
         }
 
         function openModal(id) {
