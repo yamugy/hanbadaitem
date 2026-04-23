@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -291,6 +292,66 @@
             justify-content: center;
             cursor: pointer;
         }
+
+        /* 카테고리 액션 모달 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-sheet {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            animation: slideUp 0.2s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e2937;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .modal-btn-edit {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .modal-btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .modal-btn-cancel {
+            background: #f8fafc;
+            color: #64748b;
+            margin-top: 4px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -311,6 +372,16 @@
 
         <!-- 동적 탭 -->
         <div id="tabs" class="tabs"></div>
+
+        <!-- 카테고리 액션 모달 -->
+        <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+            <div class="modal-sheet" onclick="event.stopPropagation()">
+                <div id="modal-title" class="modal-title"></div>
+                <button class="modal-btn modal-btn-edit" onclick="modalEdit()">✏️ 카테고리 이름 수정</button>
+                <button class="modal-btn modal-btn-delete" onclick="modalDelete()">🗑️ 카테고리 삭제</button>
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">취소</button>
+            </div>
+        </div>
 
         <div class="content">
             <div class="section-header">
@@ -400,6 +471,9 @@
             return data.categories.find(c => c.id === currentCategoryId)
         }
 
+        let modalTargetId = null
+        let pressTimer = null
+
         function renderTabs() {
             const container = document.getElementById('tabs')
             let html = ''
@@ -407,15 +481,50 @@
             data.categories.forEach(cat => {
                 const active = cat.id === currentCategoryId ? 'tab-active' : ''
                 html += `
-                <div onclick="switchCategory('${cat.id}')" 
-                     oncontextmenu="editCategory('${cat.id}'); return false;"
-                     class="tab ${active}">
+                <div class="tab ${active}"
+                     onclick="switchCategory('${cat.id}')"
+                     oncontextmenu="openModal('${cat.id}'); return false;"
+                     ontouchstart="startPress('${cat.id}')"
+                     ontouchend="cancelPress()"
+                     ontouchmove="cancelPress()">
                     ${cat.emoji} ${cat.name}
                 </div>`
             })
             
             html += `<div onclick="addNewCategory()" class="add-tab">+</div>`
             container.innerHTML = html
+        }
+
+        function startPress(id) {
+            pressTimer = setTimeout(() => openModal(id), 600)
+        }
+
+        function cancelPress() {
+            clearTimeout(pressTimer)
+        }
+
+        function openModal(id) {
+            modalTargetId = id
+            const cat = data.categories.find(c => c.id === id)
+            document.getElementById('modal-title').textContent = `${cat.emoji} ${cat.name}`
+            document.getElementById('modal-overlay').classList.add('show')
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('show')
+            modalTargetId = null
+        }
+
+        function modalEdit() {
+            const id = modalTargetId
+            closeModal()
+            editCategory(id)
+        }
+
+        function modalDelete() {
+            const id = modalTargetId
+            closeModal()
+            deleteCategory(id)
         }
 
         function switchCategory(id) {
